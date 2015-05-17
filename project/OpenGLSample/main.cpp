@@ -1,10 +1,24 @@
-#include "SDL.h"
-#include "GL/gl.h"
+//#include "SDL.h"
+//#include "GL/gl.h"
+//#include <stdexcept>
+//#include <iostream>
+#include "RotatingTriangle.h"
+#include "GameWindow.h"
 
-#include <stdexcept>
-#include <iostream>
+//Game Window
 
 
+int main(int argc,char* argv[])
+{
+    GAMEWINDOW.setup("Rotating triangle", 800, 600);
+    GAMEWINDOW.show(new RotatingTriangle);
+}
+
+
+
+
+
+/*/------------------------------------------------------------------------------------------
 SDL_Surface* window;
 
 //Controle do tempo
@@ -88,7 +102,7 @@ void setup(int width, int height, int bpp, bool fullscreen)
     atexit (SDL_Quit);
 }
 
-/** Espera o usuário pressionar o x da janela. */
+///** Espera o usuário pressionar o x da janela.
 void processEvents(){
 
     SDL_Event event;
@@ -109,8 +123,8 @@ void processEvents(){
                     movUp = true;
                 else if (event.key.keysym.sym == SDLK_DOWN)
                     movDown = true;
-                /*else if (event.key.keysym.sym == SDLK_RSHIFT || event.key.keysym.sym == SDLK_LSHIFT)
-                    shiftPressed = true;*/
+                ///*else if (event.key.keysym.sym == SDLK_RSHIFT || event.key.keysym.sym == SDLK_LSHIFT)
+                   // shiftPressed = true;
                 else if (event.key.keysym.sym == SDLK_ESCAPE)
                     exit(0);
                 break;
@@ -125,8 +139,8 @@ void processEvents(){
                     movDown = false;
                 else if (event.key.keysym.sym == SDLK_RIGHT)
                     rightPressed = false;
-                /*else if (event.key.keysym.sym == SDLK_RSHIFT || event.key.keysym.sym == SDLK_LSHIFT)
-                    shiftPressed = false;*/
+                ///*else if (event.key.keysym.sym == SDLK_RSHIFT || event.key.keysym.sym == SDLK_LSHIFT)
+                   // shiftPressed = false;
 
                 break;
         }
@@ -245,4 +259,4 @@ int main(int argc,char* argv[])
         exit(1);
     }
 }
-
+*/
