@@ -1,14 +1,23 @@
 #include "SDL.h"
 #include "GL/gl.h"
+
 #include <stdexcept>
 #include <iostream>
 
 SDL_Surface* window;
 
-Uint32 createFlags(bool fullscreen)
+//Controle do tempo
+Uint32 lastTicks;
+Uint32 ticks;
+
+//Total graus para rodar
+float degreesToRotate;
+
+int createFlags(bool fullscreen)
 {
+
     //Iniciamos com a OpenGL e paleta de hardware
-    Uint32 flags = SDL_OPENGL | SDL_HWPALETTE;
+    int flags = SDL_OPENGL | SDL_HWPALETTE;
 
     if (fullscreen)
         flags |= SDL_FULLSCREEN;
@@ -33,7 +42,7 @@ int setupOpenGL(int bpp, bool fullscreen)
 {
     //Atributos do opengl
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-    SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, bpp > 24 ? 24 : bpp);
+    SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, bpp);
     SDL_GL_SetAttribute( SDL_GL_ACCUM_RED_SIZE, 0);
     SDL_GL_SetAttribute( SDL_GL_ACCUM_GREEN_SIZE, 0);
     SDL_GL_SetAttribute( SDL_GL_ACCUM_BLUE_SIZE, 0);
@@ -45,7 +54,7 @@ int setupOpenGL(int bpp, bool fullscreen)
 void setup(int width, int height, int bpp, bool fullscreen)
 {
     //Inicializamos o subsistema de video.
-    if (SDL_Init(SDL_INIT_VIDEO) == -1)
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
         throw std::runtime_error(SDL_GetError());
 
     //Tentamos criar a janela
@@ -55,8 +64,9 @@ void setup(int width, int height, int bpp, bool fullscreen)
     //Sem sucesso? Lançamos uma exceção com o erro.
     if (window == NULL)
         throw std::runtime_error(SDL_GetError());
-     //Dizemos para o OpenGL usar toda a tela
-     glViewport(0,0, width, height);
+
+    glViewport(0,0, width, height);
+
     //Configuramos a função de des-inicialização
     atexit (SDL_Quit);
 }
@@ -77,31 +87,68 @@ void processEvents()
     }
 }
 
+void draw()
+{
+    glPushMatrix();
+        //Limpa a tela
+        glClearColor(0.0, 0.0, 0.0, 0.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //Gira o triângulo
+        glRotatef(degreesToRotate, 0,0,1);
+
+        //Desenha o triângulo
+        glBegin(GL_TRIANGLES);
+            glColor3f(1,0,0);
+            glVertex2f(0.0f,0.5f);
+            glColor3f(0,1,0);
+            glVertex2f(-0.5f, -0.5f);
+            glColor3f(0,0,1);
+            glVertex2f(0.5f, -0.5f);
+        glEnd();
+    glPopMatrix();
+}
+
+void processLogics()
+{
+    //Distância para girar (em graus) =
+    //velocidade (0.180f) * tempo (ticks)
+    float distance = 0.180f * ticks;
+    degreesToRotate += distance;
+}
+
 int main(int argc,char* argv[])
 {
     try
     {
         setup(640, 480, 8, false); //Faz a mágica acontecer
+        degreesToRotate = 0;
+        lastTicks = SDL_GetTicks();
 
-        //Desenhamos um triângulo
+        //Loop principal do jogo
         while (true)
         {
-            processEvents();
-            glClearColor(0.0, 0.0, 0.0, 0.0);
-            glClear(GL_COLOR_BUFFER_BIT);
+            Uint32 thisTicks = SDL_GetTicks();
+            //Calcula em ticks a diferença de tempo entre
+            //o quadro atual e o anterior
+            ticks = thisTicks - lastTicks;
 
-            glBegin(GL_TRIANGLES);
-                glColor3f(1,0,0); glVertex2f(0.0f,0.5f);
-                glColor3f(0,1,0); glVertex2f(-0.5f, -0.5f);
-                glColor3f(0,0,1); glVertex2f(0.5f, -0.5f);
-            glEnd();
+            //Atualizamos lastTicks
+            lastTicks = thisTicks;
+
+            processEvents();
+            processLogics();
+            draw();
+
+            //Trocamos a superfície de desenho
+            //pela exibida na tela
             SDL_GL_SwapBuffers();
         }
     }
     catch (std::exception &e)
     {
-        std::cout << "Error: " << e.what();
+        std::cout << "Error: "<< e.what();
         exit(1);
     }
-}//</iostream></stdexcept>
+}
 
