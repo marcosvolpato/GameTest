@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <iostream>
 
+
 SDL_Surface* window;
 
 //Controle do tempo
@@ -12,6 +13,17 @@ Uint32 ticks;
 
 //Total graus para rodar
 float degreesToRotate;
+
+
+ //o evento
+//Controle do tempo
+//Uint32 lastTicks;
+//Uint32 ticks;
+//Estado das teclas
+bool leftPressed;
+bool rightPressed;
+
+
 
 int createFlags(bool fullscreen)
 {
@@ -72,19 +84,34 @@ void setup(int width, int height, int bpp, bool fullscreen)
 }
 
 /** Espera o usuário pressionar o x da janela. */
-void processEvents()
-{
+void processEvents(){
+
     SDL_Event event;
 
-    while (SDL_PollEvent(&event) != 0)
-    {
-        switch (event.type)
-        {
+    while (SDL_PollEvent(&event) != 0){
+        switch (event.type){
             case SDL_QUIT:
-                exit(0); //Fechamos a apliação
+                exit(0); //Fechamos a aplicação
+                break;
+
+            //Testamos se a tecla foi pressionada
+            case SDL_KEYDOWN:
+                if(event.key.keysym.sym == SDLK_LEFT)
+                    leftPressed = true;
+                else if (event.key.keysym.sym == SDLK_RIGHT)
+                    rightPressed = true;
+                break;
+
+            //Testamos se a tecla foi solta
+            case SDL_KEYUP:
+                if(event.key.keysym.sym == SDLK_LEFT)
+                    leftPressed = false;
+                else if (event.key.keysym.sym == SDLK_RIGHT)
+                    rightPressed = false;
                 break;
         }
     }
+
 }
 
 void draw()
@@ -113,8 +140,22 @@ void processLogics()
 {
     //Distância para girar (em graus) =
     //velocidade (0.180f) * tempo (ticks)
+    //float distance = 0.180f * ticks;
+    //degreesToRotate += distance;
+
+
+    //Distância para girar (em graus) =
+    //velocidade (0.180f) * tempo (ticks)
     float distance = 0.180f * ticks;
-    degreesToRotate += distance;
+
+    //Está com a seta esquerda pressionada?
+    if (leftPressed)
+        degreesToRotate += distance;
+    //Está com a seta direita pressionada?
+    else if (rightPressed)
+        degreesToRotate -= distance;
+
+
 }
 
 int main(int argc,char* argv[])
@@ -124,6 +165,8 @@ int main(int argc,char* argv[])
         setup(640, 480, 8, false); //Faz a mágica acontecer
         degreesToRotate = 0;
         lastTicks = SDL_GetTicks();
+
+
 
         //Loop principal do jogo
         while (true)
