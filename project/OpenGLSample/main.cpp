@@ -13,6 +13,8 @@ Uint32 ticks;
 
 //Total graus para rodar
 float degreesToRotate;
+float movX;
+float movY;
 
 
  //o evento
@@ -22,6 +24,9 @@ float degreesToRotate;
 //Estado das teclas
 bool leftPressed;
 bool rightPressed;
+bool movUp;
+bool movDown;
+//bool shiftPressed;
 
 
 
@@ -100,6 +105,12 @@ void processEvents(){
                     leftPressed = true;
                 else if (event.key.keysym.sym == SDLK_RIGHT)
                     rightPressed = true;
+                else if (event.key.keysym.sym == SDLK_UP)
+                    movUp = true;
+                else if (event.key.keysym.sym == SDLK_DOWN)
+                    movDown = true;
+                /*else if (event.key.keysym.sym == SDLK_RSHIFT || event.key.keysym.sym == SDLK_LSHIFT)
+                    shiftPressed = true;*/
                 else if (event.key.keysym.sym == SDLK_ESCAPE)
                     exit(0);
                 break;
@@ -108,8 +119,15 @@ void processEvents(){
             case SDL_KEYUP:
                 if(event.key.keysym.sym == SDLK_LEFT)
                     leftPressed = false;
+                else if (event.key.keysym.sym == SDLK_UP)
+                    movUp = false;
+                else if (event.key.keysym.sym == SDLK_DOWN)
+                    movDown = false;
                 else if (event.key.keysym.sym == SDLK_RIGHT)
                     rightPressed = false;
+                /*else if (event.key.keysym.sym == SDLK_RSHIFT || event.key.keysym.sym == SDLK_LSHIFT)
+                    shiftPressed = false;*/
+
                 break;
         }
     }
@@ -125,6 +143,7 @@ void draw()
 
         //Gira o triângulo
         glRotatef(degreesToRotate, 0,0,1);
+        glTranslatef(movX,movY,0);
 
         //Desenha o triângulo
         glBegin(GL_TRIANGLES);
@@ -149,15 +168,36 @@ void processLogics()
     //Distância para girar (em graus) =
     //velocidade (0.180f) * tempo (ticks)
     float distance = 0.180f * ticks;
+    float distance2 = 0.00180f * ticks;
 
     //Está com a seta esquerda pressionada?
-    if (leftPressed)
-        degreesToRotate += distance;
+    if (leftPressed){
+
+        //degreesToRotate += distance;
+        movX -= distance2;
+    }
     //Está com a seta direita pressionada?
-    else if (rightPressed)
-        degreesToRotate -= distance;
-    //else if (escPressed)
-        //exit(0);
+    else if (rightPressed){
+        //degreesToRotate -= distance;
+        movX += distance2;
+    }
+    else if (movUp){
+        //degreesToRotate -= distance;
+        movY += distance2;
+    }
+    else if (movDown){
+        //degreesToRotate -= distance;
+        movY -= distance2;
+    }
+    //else if (leftPressed && shiftPressed){
+       // degreesToRotate += distance;
+        //movY -= distance2;
+    //}
+    //else if (rightPressed && shiftPressed){
+       // degreesToRotate -= distance;
+        //movY -= distance2;
+   // }
+
 
 
 }
@@ -168,8 +208,15 @@ int main(int argc,char* argv[])
     {
         setup(640, 480, 8, false); //Faz a mágica acontecer
         degreesToRotate = 0;
+        movY = 0;
+        movX = 0;
         lastTicks = SDL_GetTicks();
 
+        leftPressed = false;
+        rightPressed = false;
+        //shiftPressed = false;
+        movUp = false;
+        movDown = false;
 
 
         //Loop principal do jogo
