@@ -100,6 +100,8 @@ void processEvents(){
                     leftPressed = true;
                 else if (event.key.keysym.sym == SDLK_RIGHT)
                     rightPressed = true;
+                else if (event.key.keysym.sym == SDLK_ESCAPE)
+                    exit(0);
                 break;
 
             //Testamos se a tecla foi solta
@@ -154,6 +156,8 @@ void processLogics()
     //Está com a seta direita pressionada?
     else if (rightPressed)
         degreesToRotate -= distance;
+    //else if (escPressed)
+        //exit(0);
 
 
 }
